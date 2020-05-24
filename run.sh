@@ -58,8 +58,8 @@ fi
 
 # Cleaning up incomplete scans from previous runs
 echo "Task incomplete_scan_cleanup starting..."
-for host in $(cat discovered_hosts.list); do if ! grep -q 'exit="success"' $host/scantcpall.xml; then echo "Incomplete TCP scan detected for $host. Cleaning up..."; rm -f $host/scantcpall*; fi; done
-for host in $(cat discovered_hosts.list); do if ! grep -q 'exit="success"' $host/scanudpall.xml; then echo "Incomplete UDP scan detected for $host. Cleaning up..."; rm -f $host/scanudpall*; fi; done
+for host in $(cat discovered_hosts.list); do if [ -f $host/scantcpall.xml ] && ! grep -q 'exit="success"' $host/scantcpall.xml; then echo "Incomplete TCP scan detected for $host. Cleaning up..."; rm -f $host/scantcpall*; fi; done
+for host in $(cat discovered_hosts.list); do if [ -f $host/scanudpall.xml ] && ! grep -q 'exit="success"' $host/scanudpall.xml; then echo "Incomplete UDP scan detected for $host. Cleaning up..."; rm -f $host/scanudpall*; fi; done
 echo "Task incomplete_scan_cleanup completed"
 
 # TCP scan all ports
