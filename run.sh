@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ $# -lt 1 ]]; then
     echo "Usage $(basename $0) SUBNET"
     exit
