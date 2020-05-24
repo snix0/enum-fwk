@@ -109,4 +109,12 @@ echo "Task incomplete_port_quick_scan_cleanup completed"
 for host in $(cat discovered_hosts.list); do (if [[ ! -f $host/quicktcp.html && -s $host/tcp_ports.list ]]; then nmap -sT -p $(paste -sd, $host/tcp_ports.list) -sC -sV -O -A -oA $host/quicktcp $host && xsltproc -o $host/quicktcp.html $host/quicktcp.xml; fi) & done
 for host in $(cat discovered_hosts.list); do (if [[ ! -f $host/quickudp.html && -s $host/udp_ports.list ]]; then nmap -sU -p $(paste -sd, $host/udp_ports.list) -sC -sV -O -A -oA $host/quickudp $host && xsltproc -o $host/quickudp.html $host/quickudp.xml; fi) & done
 
-# TODO Service specific scans
+wait
+
+# Generate searchsploit reports
+echo "Task generate_sploit_reports starting..."
+find . \( -name 'quicktcp.xml' -o -name 'quickudp.xml' \) ! -exec bash -c 'test -f $(dirname "$1")/$(basename "$1" .xml).sploit.url' bash {} ';' -exec bash -c 'searchsploit -w --nmap {} | tr -s " " > $(dirname "$1")/$(basename "$1" .xml).sploit.url &' bash {} \;
+find . \( -name 'quicktcp.xml' -o -name 'quickudp.xml' \) ! -exec bash -c 'test -f $(dirname "$1")/$(basename "$1" .xml).sploit.local' bash {} ';' -exec bash -c 'searchsploit --nmap {} | tr -s " " > $(dirname "$1")/$(basename "$1" .xml).sploit.local &' bash {} \;
+echo "Task generate_sploit_reports completed"
+
+wait
