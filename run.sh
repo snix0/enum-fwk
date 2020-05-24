@@ -7,7 +7,12 @@ RANGE=$1
 
 # Host discovery
 echo "Task host_discovery starting..."
-nmap -sn $RANGE -oA discovered_hosts
+if [ -f discovered_hosts.xml ]; then
+    echo "discovered_hosts.xml already exists. Skipping task."
+else
+    nmap -sn $RANGE -oA discovered_hosts
+    echo "Task host_discovery completed"
+fi
 
 if [[ $? -ne 0 ]]; then
     echo "Task host_discovery failed."
@@ -16,7 +21,12 @@ fi
 
 # Generate shortlist of hosts
 echo "Task generate_host_shortlist starting..."
-cut -f2 -d' ' discovered_hosts.gnmap | sed '1d;$d' > discovered_hosts.list
+if [ -f discovered_hosts.list ]; then
+    echo "discovered_hosts.list already exists. Skipping task."
+else
+    cut -f2 -d' ' discovered_hosts.gnmap | sed '1d;$d' > discovered_hosts.list
+    echo "Task genernate_host_shortlist completed"
+fi
 
 if [[ $? -ne 0 ]]; then
     echo "Task generate_host_shortlist failed."
