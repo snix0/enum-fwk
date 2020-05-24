@@ -66,10 +66,10 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Cleaning up incomplete scans from previous runs
-echo "Task incomplete_scan_cleanup starting..."
+echo "Task incomplete_port_discov_scan_cleanup starting..."
 for host in $(cat discovered_hosts.list); do if [ -f $host/scantcpall.xml ] && ! grep -q 'exit="success"' $host/scantcpall.xml; then echo "Incomplete TCP scan detected for $host. Cleaning up..."; rm -f $host/scantcpall*; fi; done
 for host in $(cat discovered_hosts.list); do if [ -f $host/scanudpall.xml ] && ! grep -q 'exit="success"' $host/scanudpall.xml; then echo "Incomplete UDP scan detected for $host. Cleaning up..."; rm -f $host/scanudpall*; fi; done
-echo "Task incomplete_scan_cleanup completed"
+echo "Task incomplete_port_discov_scan_cleanup completed"
 
 # TCP scan all ports
 echo "Task scan_tcp_all starting..."
@@ -99,5 +99,14 @@ echo "Task generate_udp_port_shortlist starting..."
 for host in $(cat discovered_hosts.list); do grep open $host/scanudpall.nmap | cut -f1 -d'/' | grep -v '^[^0-9]*$' > $host/udp_ports.list; done
 echo "Task generate_udp_port_shortlist completed"
 
-# TODO More thorough TCP scan on found ports
-echo "Done"
+# Cleanup quick scan
+echo "Task incomplete_port_quick_scan_cleanup starting..."
+for host in $(cat discovered_hosts.list); do if [ -f $host/quicktcp.xml ] && ! grep -q 'exit="success"' $host/quicktcp.xml; then echo "Incomplete TCP scan detected for $host. Cleaning up..."; rm -f $host/quicktcp*; fi; done
+for host in $(cat discovered_hosts.list); do if [ -f $host/quickudp.xml ] && ! grep -q 'exit="success"' $host/quickudp.xml; then echo "Incomplete UDP scan detected for $host. Cleaning up..."; rm -f $host/quickudp*; fi; done
+echo "Task incomplete_port_quick_scan_cleanup completed"
+
+# Quick port scan
+for host in $(cat discovered_hosts.list); do (if [[ ! -f $host/quicktcp.html && -s $host/tcp_ports.list ]]; then nmap -sT -p $(paste -sd, $host/tcp_ports.list) -sC -sV -O -A -oA $host/quicktcp $host && xsltproc -o $host/quicktcp.html $host/quicktcp.xml; fi) & done
+for host in $(cat discovered_hosts.list); do (if [[ ! -f $host/quickudp.html && -s $host/udp_ports.list ]]; then nmap -sU -p $(paste -sd, $host/udp_ports.list) -sC -sV -O -A -oA $host/quickudp $host && xsltproc -o $host/quickudp.html $host/quickudp.xml; fi) & done
+
+# TODO Service specific scans
