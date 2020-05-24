@@ -65,7 +65,7 @@ fi
 
 # UDP scan all ports
 echo "Task scan_udp_all starting..."
-for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then sudo nmap -sU --top-ports $host -oA $host/scanudpall; xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
+for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then sudo nmap -sU --top-ports 1000 $host -oA $host/scanudpall; xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
 
 if [[ $? -ne 0 ]]; then
     echo "Task scan_udp_all failed."
