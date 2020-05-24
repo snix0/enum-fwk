@@ -64,7 +64,7 @@ echo "Task incomplete_scan_cleanup completed"
 
 # TCP scan all ports
 echo "Task scan_tcp_all starting..."
-for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scantcpall.xml ]; then nmap -sT -p- $host -oA $host/scantcpall; xsltproc -o $host/scantcpall.html $host/scantcpall.xml; fi) & done
+for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scantcpall.xml ]; then nmap -sT -p- $host -oA $host/scantcpall && xsltproc -o $host/scantcpall.html $host/scantcpall.xml; fi) & done
 
 if [[ $? -ne 0 ]]; then
     echo "Task scan_tcp_all failed."
@@ -73,7 +73,7 @@ fi
 
 # UDP scan all ports
 echo "Task scan_udp_all starting..."
-for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then sudo nmap -sU --top-ports 1000 $host -oA $host/scanudpall; xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
+for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then nmap -sU --top-ports 1000 $host -oA $host/scanudpall && xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
 
 if [[ $? -ne 0 ]]; then
     echo "Task scan_udp_all failed."
