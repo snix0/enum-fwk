@@ -7,9 +7,18 @@ fi
 
 RANGE=$1
 
+# Check if user is root
 if [[ ${EUID} -ne 0 ]]; then
     echo "This script should be run as root due to some features requiring elevated privileges (e.g. UDP scanning)."
     exit 1
+fi
+
+# Check if nmap is already running
+if ps aux | grep nmap | grep -q -v grep; then
+    read -e -p "Nmap scan is currently running. Would you like to proceed anyway? [yN]: "
+    if [[ ! ${REPLY} =~ [Yy] ]]; then
+        exit
+    fi
 fi
 
 # Host discovery
