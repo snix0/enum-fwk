@@ -5,6 +5,11 @@ fi
 
 RANGE=$1
 
+if [[ ${EUID} -ne 0 ]]; then
+    echo "This script should be run as root due to some features requiring elevated privileges (e.g. UDP scanning)."
+    exit 1
+fi
+
 # Host discovery
 echo "Task host_discovery starting..."
 if [ -f discovered_hosts.xml ]; then
@@ -60,7 +65,7 @@ fi
 
 # UDP scan all ports
 echo "Task scan_udp_all starting..."
-for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then nmap -sU -p- $host -oA $host/scanudpall; xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
+for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scanudpall.xml ]; then sudo nmap -sU --top-ports $host -oA $host/scanudpall; xsltproc -o $host/scanudpall.html $host/scanudpall.xml; fi) & done
 
 if [[ $? -ne 0 ]]; then
     echo "Task scan_udp_all failed."
