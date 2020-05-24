@@ -56,6 +56,12 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+# Cleaning up incomplete scans from previous runs
+echo "Task incomplete_scan_cleanup starting..."
+for host in $(cat discovered_hosts.list); do if ! grep -q 'exit="success"' $host/scantcpall.xml; then echo "Incomplete TCP scan detected for $host. Cleaning up..."; rm -f $host/scantcpall*; fi; done
+for host in $(cat discovered_hosts.list); do if ! grep -q 'exit="success"' $host/scanudpall.xml; then echo "Incomplete UDP scan detected for $host. Cleaning up..."; rm -f $host/scanudpall*; fi; done
+echo "Task incomplete_scan_cleanup completed"
+
 # TCP scan all ports
 echo "Task scan_tcp_all starting..."
 for host in $(cat discovered_hosts.list); do (if [ ! -f $host/scantcpall.xml ]; then nmap -sT -p- $host -oA $host/scantcpall; xsltproc -o $host/scantcpall.html $host/scantcpall.xml; fi) & done
@@ -75,6 +81,14 @@ if [[ $? -ne 0 ]]; then
 fi
 
 wait
+
+echo "Task generate_tcp_port_shortlist starting..."
+for host in $(cat discovered_hosts.list); do grep open $host/scantcpall.nmap | cut -f1 -d'/' | grep -v '^[^0-9]*$' > $host/tcp_ports.list; done
+echo "Task generate_tcp_port_shortlist completed"
+
+echo "Task generate_udp_port_shortlist starting..."
+for host in $(cat discovered_hosts.list); do grep open $host/scanudpall.nmap | cut -f1 -d'/' | grep -v '^[^0-9]*$' > $host/udp_ports.list; done
+echo "Task generate_udp_port_shortlist completed"
 
 # TODO More thorough TCP scan on found ports
 echo "Done"
