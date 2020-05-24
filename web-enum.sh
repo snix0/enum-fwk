@@ -5,10 +5,10 @@
 # Ports: 80, 443
 # Dependencies: gobuster, nikto, wfuzz, wordlists
 
-ports="80 443"
+ports="80"
 
-for port in 80 443; do
-    one-liners/oscp/scan-hosts-for-port.sh $port "$PWD" > $port.hosts
+for port in $ports; do
+    one-liners/oscp/scan-hosts-for-port.sh "$PWD" $port | grep -v "SCANDIR" > $port.hosts
     if [[ -s $port.hosts ]]; then
         for host in $(cat $port.hosts); do
             gobuster -q dir -u "http://$host" -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o $host/gobuster.$port
