@@ -1,0 +1,3 @@
+[submodule "one-liners"]
+	path = one-liners
+	url = git@github.com:ayfeng/one-liners.git
