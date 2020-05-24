@@ -92,11 +92,11 @@ fi
 wait
 
 echo "Task generate_tcp_port_shortlist starting..."
-for host in $(cat discovered_hosts.list); do grep open $host/scantcpall.nmap | cut -f1 -d'/' | grep -v '^[^0-9]*$' > $host/tcp_ports.list; done
+for host in $(cat discovered_hosts.list); do grep open $host/scantcpall.nmap | cut -f1 -d'/' | grep -v '[^0-9]' > $host/tcp_ports.list; done
 echo "Task generate_tcp_port_shortlist completed"
 
 echo "Task generate_udp_port_shortlist starting..."
-for host in $(cat discovered_hosts.list); do grep open $host/scanudpall.nmap | cut -f1 -d'/' | grep -v '^[^0-9]*$' > $host/udp_ports.list; done
+for host in $(cat discovered_hosts.list); do grep open $host/scanudpall.nmap | cut -f1 -d'/' | grep -v '[^0-9]' > $host/udp_ports.list; done
 echo "Task generate_udp_port_shortlist completed"
 
 # Cleanup quick scan
